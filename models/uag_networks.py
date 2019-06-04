@@ -164,3 +164,35 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
+def define_net_att(in_nc, 
+                   ngf, 
+                   norm='instance', 
+                   block_mode='bottleneck',
+                   init_type='normal', 
+                   init_gain=0.02, 
+                   gpu_ids=[]):
+    net = ResNetGenerator_Att(in_nc, ngf, norm=norm, block_mode=block_mode)
+    return init_net(net, init_type, init_gain, gpu_ids)
+
+def define_net_img(in_nc, 
+                   out_nc, 
+                   ngf, 
+                   num_blocks=9, 
+                   norm='instance', 
+                   block_mode='bottleneck',
+                   init_type='normal', 
+                   init_gain=0.02, 
+                   gpu_ids=[]):
+    net = ResNetGenerator_Img(in_nc, out_nc, ngf, num_blocks=num_blocks, norm=norm, block_mode=block_mode)
+    return init_net(net, init_type, init_gain, gpu_ids)
+
+def define_net_dis(in_nc, 
+                   ndf, 
+                   n_layers=3, 
+                   norm='instance', 
+                   init_type='normal', 
+                   init_gain=0.02, 
+                   gpu_ids=[]):
+    net = Discriminator(in_nc, ngf, n_layers, norm=norm)
+    return init_net(net, init_type, init_gain, gpu_ids)
