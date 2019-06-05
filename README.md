@@ -20,3 +20,13 @@ bash ./download_datasets.sh horse2zebra
 
 ### Training
 
+```
+sh ./scripts/train_uaggan.sh
+```
+
+or
+
+```
+nohup sh -u ./scripts/train_uaggan.sh > uag.log &
+```
+
