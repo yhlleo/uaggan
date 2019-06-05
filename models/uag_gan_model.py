@@ -28,8 +28,9 @@ class UAGGANModel(BaseModel):
         """
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = []
-        self.visual_names = []
+        self.loss_names = ['D_A', 'D_B', 'G_A', 'G_B', 'cycle_A', 'cycle_B']
+        self.visual_names = ['real_A', 'att_A', 'fake_B', 'masked_fake_B', 
+                             'real_B', 'att_B', 'fake_A', 'masked_fake_A']
         if self.isTrain:
             self.model_names = ['G_att', 'G_img_A', 'G_img_B', 'D']
         else:  # during test time, only load Gs
@@ -116,17 +117,19 @@ class UAGGANModel(BaseModel):
         self.cycle_att_B = (self.netG_att(self.masked_fake_B)>self.opt.thresh).float()
         self.cycle_fake_A = self.netG_img_B(self.masked_fake_B)
         self.cycle_masked_fake_A = self.cycle_fake_A*self.cycle_att_A + self.masked_fake_B*(1-self.cycle_att_A)
-        
-        if self.isTrain:
-            # G(B) -> A
-            self.att_B = (self.netG_att(self.real_B)>self.opt.thresh).float()
-            self.fake_A = self.netG_img_B(self.real_B)
-            self.masked_fake_A = self.fake_A*self.att_B + self.real_B*(1-self.att_B)
 
-            # cycle G(G(B)) -> B
-            self.cycle_att_A = (self.netG_att(self.masked_fake_A)>self.opt.thresh).float()
-            self.cycle_fake_B = self.netG_img_B(self.masked_fake_A)
-            self.cycle_masked_fake_B = self.cycle_fake_B*self.cycle_att_A + self.masked_fake_A*(1-self.cycle_att_A)
+        # G(B) -> A
+        self.att_B = (self.netG_att(self.real_B)>self.opt.thresh).float()
+        self.fake_A = self.netG_img_B(self.real_B)
+        self.masked_fake_A = self.fake_A*self.att_B + self.real_B*(1-self.att_B)
+
+        # cycle G(G(B)) -> B
+        self.cycle_att_A = (self.netG_att(self.masked_fake_A)>self.opt.thresh).float()
+        self.cycle_fake_B = self.netG_img_B(self.masked_fake_A)
+        self.cycle_masked_fake_B = self.cycle_fake_B*self.cycle_att_A + self.masked_fake_A*(1-self.cycle_att_A)
+
+        # just for visualization
+        self.att_A, self.att_B = (self.att_A-0.5)/0.5, (self.att_B-0.5)/0.5
 
     def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator
