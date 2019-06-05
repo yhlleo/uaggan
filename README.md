@@ -4,3 +4,19 @@ A Pytorch implementation of "Unsupervised Attention-Guided Image-to-Image Transl
 Based on the framework: [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
 
 ---------
+
+### Installation
+
+For Conda users, we provide a installation script `./scripts/conda_deps.sh`. Alternatively, you can create a new Conda environment using `conda env create -f environment.yml`.
+
+### Prepare Dataset:
+
+ - Download a CycleGAN dataset (e.g. horse2zebra, apple2orange):
+
+```
+bash ./download_datasets.sh horse2zebra
+```
+ - Use your own dataset: put images from each domain at folder_a and folder_b respectively.
+
+### Training
+
