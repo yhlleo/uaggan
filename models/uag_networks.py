@@ -124,7 +124,7 @@ class ResNetGenerator_Img(nn.Module):
         for i in range(num_blocks):
             model += [baseblock(ngf*4, ngf*4, ngf, norm=norm)]
 
-        model += [nn.ConvTranspose2d(ngf*2, ngf*2, kernel_size=3, stride=2,
+        model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=3, stride=2,
                                          padding=1, output_padding=1, bias=False),
                   norm_layer(ngf*2),
                   nn.ReLU(inplace=True),
