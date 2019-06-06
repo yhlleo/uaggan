@@ -120,7 +120,7 @@ class ResNetGenerator_Img(nn.Module):
                  norm_layer(ngf*4),
                  nn.ReLU(inplace=True)]
 
-        baseblock = Bottleneck if block_mode = 'bottleneck' else Basicblock
+        baseblock = Bottleneck if block_mode == 'bottleneck' else Basicblock
         for i in range(num_blocks):
             model += [baseblock(ngf*4, ngf*4, ngf, norm=norm)]
 
