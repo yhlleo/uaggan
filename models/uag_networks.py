@@ -73,7 +73,7 @@ class ResNetGenerator_Att(nn.Module):
         model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=2, padding=3, bias=False),
                  norm_layer(ngf),
                  nn.ReLU(inplace=True),
-                 nn.Conv2d(in_nc, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
+                 nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
                  norm_layer(ngf),
                  nn.ReLU(inplace=True)]
 
