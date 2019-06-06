@@ -33,17 +33,24 @@ class UAGGANModel(BaseModel):
         self.visual_names = ['real_A', 'att_A', 'fake_B', 'masked_fake_B', 
                              'real_B', 'att_B', 'fake_A', 'masked_fake_A']
         if self.isTrain:
-            self.model_names = ['G_att', 'G_img_A', 'G_img_B', 'D_A', 'D_B']
+            self.model_names = ['G_att_A', 'G_att_B', 'G_img_A', 'G_img_B', 'D_A', 'D_B']
         else:  # during test time, only load Gs
-            self.model_names = ['G_att', 'G_img_A', 'G_img_B']
+            self.model_names = ['G_att_A', 'G_att_B', 'G_img_A', 'G_img_B']
         
 
-        self.netG_att = uag.define_net_att(opt.input_nc,
-                                           opt.ngf,
-                                           norm=opt.norm,
-                                           init_type=opt.init_type,
-                                           init_gain=opt.init_gain,
-                                           gpu_ids=opt.gpu_ids)
+        self.netG_att_A = uag.define_net_att(opt.input_nc,
+                                             opt.ngf,
+                                             norm=opt.norm,
+                                             init_type=opt.init_type,
+                                             init_gain=opt.init_gain,
+                                             gpu_ids=opt.gpu_ids)
+
+        self.netG_att_B = uag.define_net_att(opt.input_nc,
+                                             opt.ngf,
+                                             norm=opt.norm,
+                                             init_type=opt.init_type,
+                                             init_gain=opt.init_gain,
+                                             gpu_ids=opt.gpu_ids)
 
         self.netG_img_A = uag.define_net_img(opt.input_nc,
                                              opt.output_nc,
@@ -83,10 +90,14 @@ class UAGGANModel(BaseModel):
             # define loss functions
             self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)  # define GAN loss.
             self.criterionCycle = torch.nn.L1Loss()
-            self.criterionIdt = torch.nn.L1Loss()
+            #self.criterionIdt = torch.nn.L1Loss()
             # initialize optimizers; schedulers will be automatically created by function <BaseModel.setup>.
-            self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_att.parameters(), 
-                self.netG_img_A.parameters(), self.netG_img_B.parameters()), lr=opt.lr, betas=(opt.beta1, 0.999))
+            self.optimizer_G = torch.optim.Adam(itertools.chain(
+                    self.netG_att_A.parameters(), 
+                    self.netG_att_B.parameters(),
+                    self.netG_img_A.parameters(), 
+                    self.netG_img_B.parameters()), 
+                lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), 
                 lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizers.append(self.optimizer_G)
@@ -109,21 +120,21 @@ class UAGGANModel(BaseModel):
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         # G(A) -> B
-        self.att_A = self.netG_att(self.real_A)
+        self.att_A = self.netG_att_A(self.real_A)
         self.fake_B = self.netG_img_A(self.real_A)
         self.masked_fake_B = self.fake_B*self.att_A + self.real_A*(1-self.att_A)
         # cycle G(G(A)) -> A
-        self.cycle_att_B = self.netG_att(self.masked_fake_B)
+        self.cycle_att_B = self.netG_att_B(self.masked_fake_B)
         self.cycle_fake_A = self.netG_img_B(self.masked_fake_B)
         self.cycle_masked_fake_A = self.cycle_fake_A*self.cycle_att_B + self.masked_fake_B*(1-self.cycle_att_B)
 
         # G(B) -> A
-        self.att_B = self.netG_att(self.real_B)
+        self.att_B = self.netG_att_B(self.real_B)
         self.fake_A = self.netG_img_B(self.real_B)
         self.masked_fake_A = self.fake_A*self.att_B + self.real_B*(1-self.att_B)
 
         # cycle G(G(B)) -> B
-        self.cycle_att_A = self.netG_att(self.masked_fake_A)
+        self.cycle_att_A = self.netG_att_A(self.masked_fake_A)
         self.cycle_fake_B = self.netG_img_B(self.masked_fake_A)
         self.cycle_masked_fake_B = self.cycle_fake_B*self.cycle_att_A + self.masked_fake_A*(1-self.cycle_att_A)
 
