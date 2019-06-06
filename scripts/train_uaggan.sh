@@ -5,7 +5,6 @@ python train.py \
   --name uaggan_horse2zebra \
   --model uag_gan \
   --pool_size 50 \
-  --thresh 0.1 \
   --gpu_ids ${GPU_ID} \
   --batch_size 1 \
   --no_dropout
