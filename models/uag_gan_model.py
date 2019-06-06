@@ -77,8 +77,6 @@ class UAGGANModel(BaseModel):
                                              gpu_ids=opt.gpu_ids)
 
         if self.isTrain:
-            if opt.lambda_identity > 0.0:  # only works when input and output images have the same number of channels
-                assert(opt.input_nc == opt.output_nc)
             self.masked_fake_A_pool = ImagePool(opt.pool_size)
             self.masked_fake_B_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
             # define loss functions
