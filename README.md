@@ -18,7 +18,9 @@ bash ./datasets/download_cyclegan_dataset.sh horse2zebra
 ```
  - Use your own dataset: put images from each domain at folder_a and folder_b respectively.
 
-### Training
+### Usage
+
+ - Training
 
 ```
 sh ./scripts/train_uaggan.sh
@@ -29,4 +31,16 @@ or
 ```
 nohup sh -u ./scripts/train_uaggan.sh > uag.log &
 ```
+
+- Test
+
+```
+sh ./scripts/test_uaggan.sh
+```
+
+### Mapping results
+
+ - horse2zebra
+
+ - apple2orange
 
