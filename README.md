@@ -14,7 +14,7 @@ For Conda users, we provide a installation script `./scripts/conda_deps.sh`. Alt
  - Download a CycleGAN dataset (e.g. horse2zebra, apple2orange):
 
 ```
-bash ./download_datasets.sh horse2zebra
+bash ./download_cyclegan_dataset.sh horse2zebra
 ```
  - Use your own dataset: put images from each domain at folder_a and folder_b respectively.
 
