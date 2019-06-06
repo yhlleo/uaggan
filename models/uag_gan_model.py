@@ -33,7 +33,7 @@ class UAGGANModel(BaseModel):
         self.visual_names = ['real_A', 'att_A', 'fake_B', 'masked_fake_B', 
                              'real_B', 'att_B', 'fake_A', 'masked_fake_A']
         if self.isTrain:
-            self.model_names = ['G_att', 'G_img_A', 'G_img_B', 'D']
+            self.model_names = ['G_att', 'G_img_A', 'G_img_B', 'D_A', 'D_B']
         else:  # during test time, only load Gs
             self.model_names = ['G_att', 'G_img_A', 'G_img_B']
         
