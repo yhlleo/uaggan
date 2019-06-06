@@ -109,21 +109,21 @@ class UAGGANModel(BaseModel):
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         # G(A) -> B
-        self.att_A = (self.netG_att(self.real_A)>self.opt.thresh).float()
+        self.att_A = self.netG_att(self.real_A)
         self.fake_B = self.netG_img_A(self.real_A)
         self.masked_fake_B = self.fake_B*self.att_A + self.real_A*(1-self.att_A)
         # cycle G(G(A)) -> A
-        self.cycle_att_B = (self.netG_att(self.masked_fake_B)>self.opt.thresh).float()
+        self.cycle_att_B = self.netG_att(self.masked_fake_B)
         self.cycle_fake_A = self.netG_img_B(self.masked_fake_B)
         self.cycle_masked_fake_A = self.cycle_fake_A*self.cycle_att_B + self.masked_fake_B*(1-self.cycle_att_B)
 
         # G(B) -> A
-        self.att_B = (self.netG_att(self.real_B)>self.opt.thresh).float()
+        self.att_B = self.netG_att(self.real_B)
         self.fake_A = self.netG_img_B(self.real_B)
         self.masked_fake_A = self.fake_A*self.att_B + self.real_B*(1-self.att_B)
 
         # cycle G(G(B)) -> B
-        self.cycle_att_A = (self.netG_att(self.masked_fake_A)>self.opt.thresh).float()
+        self.cycle_att_A = self.netG_att(self.masked_fake_A)
         self.cycle_fake_B = self.netG_img_B(self.masked_fake_A)
         self.cycle_masked_fake_B = self.cycle_fake_B*self.cycle_att_A + self.masked_fake_A*(1-self.cycle_att_A)
 
