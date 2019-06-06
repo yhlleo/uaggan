@@ -194,5 +194,5 @@ def define_net_dis(in_nc,
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
-    net = Discriminator(in_nc, ngf, n_layers, norm=norm)
+    net = Discriminator(in_nc, ndf, n_layers, norm=norm)
     return init_net(net, init_type, init_gain, gpu_ids)

@@ -54,7 +54,7 @@ class UAGGANModel(BaseModel):
         
         self.netG_img_B = uag.define_net_img(opt.input_nc,
                                              opt.output_nc,
-                                             opt.ngf,
+                                             opt.ndf,
                                              norm=opt.norm,
                                              init_type=opt.init_type,
                                              init_gain=opt.init_gain,
