@@ -77,7 +77,7 @@ class ResNetGenerator_Att(nn.Module):
                  norm_layer(ngf),
                  nn.ReLU(inplace=True)]
 
-        if block_mode = 'bottleneck':
+        if block_mode == 'bottleneck':
             model += [Bottleneck(ngf*2, ngf*2, ngf*2, norm=norm)]
         else:
             model += [Basicblock(ngf*2, norm=norm)]
