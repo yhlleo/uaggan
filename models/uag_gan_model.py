@@ -1,6 +1,6 @@
 import torch
 import itertools
-from util.image_pool import ImagePool
+from util.image_pool import ImageMaskPool
 from .base_model import BaseModel
 from . import networks 
 from . import uag_networks as uag
