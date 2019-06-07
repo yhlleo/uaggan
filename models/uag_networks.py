@@ -65,7 +65,7 @@ class Bottleneck(nn.Module):
 
 class ResNetGenerator_Att(nn.Module):
     '''ResNet-based generator for attention mask prediction.'''
-    def __init__(self, in_nc, ngf, norm='instance', block_mode='bottleneck'):
+    def __init__(self, in_nc, ngf, norm='instance', block_mode='basic'):
         super(ResNetGenerator_Att, self).__init__()
         assert block_mode in ['bottleneck', 'basic']
 
@@ -96,7 +96,7 @@ class ResNetGenerator_Att(nn.Module):
                   nn.Conv2d(ngf*2, ngf, kernel_size=3, stride=1, padding=1, bias=False),
                   norm_layer(ngf),
                   nn.ReLU(inplace=True),
-                  nn.Conv2d(ngf, 1, kernel_size=1, stride=1, padding=0, bias=False),
+                  nn.Conv2d(ngf, 1, kernel_size=7, stride=1, padding=3, bias=False),
                   nn.Sigmoid()]
         self.model = nn.Sequential(*model)
     
@@ -105,7 +105,7 @@ class ResNetGenerator_Att(nn.Module):
 
 class ResNetGenerator_Img(nn.Module):
     '''ResNet-based generator for target generation.'''
-    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', block_mode='bottleneck'):
+    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', block_mode='basic'):
         super(ResNetGenerator_Img, self).__init__()
         assert block_mode in ['bottleneck', 'basic']
 
@@ -168,7 +168,7 @@ class Discriminator(nn.Module):
 def define_net_att(in_nc, 
                    ngf, 
                    norm='instance', 
-                   block_mode='bottleneck',
+                   block_mode='basic',
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
@@ -180,7 +180,7 @@ def define_net_img(in_nc,
                    ngf, 
                    num_blocks=9, 
                    norm='instance', 
-                   block_mode='bottleneck',
+                   block_mode='basic',
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
