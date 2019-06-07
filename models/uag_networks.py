@@ -14,7 +14,7 @@ from .networks import init_net, get_norm_layer
 
 class Basicblock(nn.Module):
     '''A simple version of residual block.'''
-    def __init__(self, in_feat, out_feat=0, depth_bottleneck=0, kernel_size=3, stride=1, padding=1, norm='instance'):
+    def __init__(self, in_feat, kernel_size=3, stride=1, padding=1, norm='instance'):
         super(Basicblock, self).__init__()
 
         norm_layer = get_norm_layer(norm)
@@ -81,7 +81,7 @@ class ResNetGenerator_Img(nn.Module):
                  nn.ReLU(inplace=True)]
 
         for i in range(num_blocks):
-            model += [Basicblock(ngf*4, ngf*4, ngf, norm=norm)]
+            model += [Basicblock(ngf*4, norm=norm)]
 
         model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=3, stride=2,
                                          padding=1, output_padding=1, bias=False),
