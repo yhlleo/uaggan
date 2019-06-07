@@ -122,6 +122,7 @@ class UAGGANModel(BaseModel):
         self.att_A = self.netG_att_A(self.real_A)
         self.fake_B = self.netG_img_A(self.real_A)
         self.masked_fake_B = self.fake_B*self.att_A + self.real_A*(1-self.att_A)
+        
         # cycle G(G(A)) -> A
         self.cycle_att_B = self.netG_att_B(self.masked_fake_B)
         self.cycle_fake_A = self.netG_img_B(self.masked_fake_B)

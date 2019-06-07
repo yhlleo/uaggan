@@ -53,7 +53,7 @@ class Bottleneck(nn.Module):
                     nn.Conv2d(depth_bottleneck, out_feat, kernel_size=1, stride=1, bias=False),
                     norm_layer(out_feat)]
         self.residual = nn.Sequential(*residual)
-        self.relu = nn,ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
         preact = self.preact(x)
