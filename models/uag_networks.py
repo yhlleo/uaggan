@@ -22,8 +22,7 @@ class Basicblock(nn.Module):
                     norm_layer(in_feat),
                     nn.ReLU(inplace=True),
                     nn.Conv2d(in_feat, in_feat, kernel_size=kernel_size, stride=stride, padding=padding, bias=False),
-                    norm_layer(in_feat),
-                    nn.ReLU(inplace=True)]
+                    norm_layer(in_feat)]
         self.residual = nn.Sequential(*residual)
 
     def forward(self, x):
