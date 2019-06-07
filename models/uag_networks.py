@@ -120,7 +120,7 @@ class ResNetGenerator_Img(nn.Module):
 
         for i in range(num_blocks):
             if residual_mode == 'bottleneck':
-                model += [baseblock(ngf*4, ngf*4, ngf, norm=norm)]
+                model += [Bottleneck(ngf*4, ngf*4, ngf, norm=norm)]
             else:
                 model += [Basicblock(ngf*4, norm=norm)]
 
