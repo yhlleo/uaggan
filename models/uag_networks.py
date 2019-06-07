@@ -29,45 +29,10 @@ class Basicblock(nn.Module):
     def forward(self, x):
         return x + self.residual(x)
 
-class Bottleneck(nn.Module):
-    '''ResNet v2 residual block.'''
-    def __init__(self, in_feat, out_feat, depth_bottleneck, kernel_size=1, stride=1, padding=0, norm='instance'):
-        super(Bottleneck, self).__init__()
-
-        norm_layer = get_norm_layer(norm)
-        self.in_equal_out = in_feat == out_feat
-        
-        self.preact = nn.Sequential(norm_layer(in_feat),
-                                    nn.ReLU(inplace=True))
-
-        if self.in_equal_out:
-            self.shortcut = nn.MaxPool2d(1, stride=stride)
-        else:
-            self.shortcut = nn.Sequential(nn.Conv2d(in_feat, out_feat, kernel_size=1, stride=stride, bias=False))
-
-        residual = [nn.Conv2d(in_feat, depth_bottleneck, kernel_size=1, stride=1, bias=False),
-                    norm_layer(depth_bottleneck),
-                    nn.ReLU(inplace=True),
-                    nn.Conv2d(depth_bottleneck, depth_bottleneck, kernel_size=3, stride=stride, padding=1, bias=False),
-                    norm_layer(depth_bottleneck),
-                    nn.ReLU(inplace=True),
-                    nn.Conv2d(depth_bottleneck, out_feat, kernel_size=1, stride=1, bias=False),
-                    norm_layer(out_feat)]
-        self.residual = nn.Sequential(*residual)
-
-    def forward(self, x):
-        preact = self.preact(x)
-        if self.in_equal_out:
-            shortcut = self.shortcut(x)
-        else:
-            shortcut = self.shortcut(preact)
-        return shortcut + self.residual(x)
-
 class ResNetGenerator_Att(nn.Module):
     '''ResNet-based generator for attention mask prediction.'''
-    def __init__(self, in_nc, ngf, norm='instance', block_mode='basic'):
+    def __init__(self, in_nc, ngf, norm='instance'):
         super(ResNetGenerator_Att, self).__init__()
-        assert block_mode in ['bottleneck', 'basic']
 
         norm_layer = get_norm_layer(norm)
         model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=2, padding=3, bias=False),
@@ -77,10 +42,7 @@ class ResNetGenerator_Att(nn.Module):
                  norm_layer(ngf),
                  nn.ReLU(inplace=True)]
 
-        if block_mode == 'bottleneck':
-            model += [Bottleneck(ngf*2, ngf*2, ngf*2, norm=norm)]
-        else:
-            model += [Basicblock(ngf*2, norm=norm)]
+        model += [Basicblock(ngf*2, norm=norm)]
 
         model += [nn.ConvTranspose2d(ngf*2, ngf*2, kernel_size=3, stride=2,
                                      padding=1, output_padding=1, bias=False),
@@ -105,9 +67,8 @@ class ResNetGenerator_Att(nn.Module):
 
 class ResNetGenerator_Img(nn.Module):
     '''ResNet-based generator for target generation.'''
-    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', block_mode='basic'):
+    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance'):
         super(ResNetGenerator_Img, self).__init__()
-        assert block_mode in ['bottleneck', 'basic']
 
         norm_layer = get_norm_layer(norm)
         model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=1, padding=3, bias=False),
@@ -120,9 +81,8 @@ class ResNetGenerator_Img(nn.Module):
                  norm_layer(ngf*4),
                  nn.ReLU(inplace=True)]
 
-        baseblock = Bottleneck if block_mode == 'bottleneck' else Basicblock
         for i in range(num_blocks):
-            model += [baseblock(ngf*4, ngf*4, ngf, norm=norm)]
+            model += [Basicblock(ngf*4, ngf*4, ngf, norm=norm)]
 
         model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=3, stride=2,
                                          padding=1, output_padding=1, bias=False),
@@ -168,7 +128,6 @@ class Discriminator(nn.Module):
 def define_net_att(in_nc, 
                    ngf, 
                    norm='instance', 
-                   block_mode='basic',
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
@@ -180,7 +139,6 @@ def define_net_img(in_nc,
                    ngf, 
                    num_blocks=9, 
                    norm='instance', 
-                   block_mode='basic',
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
