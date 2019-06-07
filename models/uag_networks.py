@@ -106,7 +106,7 @@ class ResNetGenerator_Img(nn.Module):
     def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', residual_mode='bottleneck'):
         super(ResNetGenerator_Img, self).__init__()
         assert residual_mode in ['bottleneck', 'basic']
-        
+
         norm_layer = get_norm_layer(norm)
         model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=1, padding=3, bias=False),
                  norm_layer(ngf),
@@ -120,7 +120,7 @@ class ResNetGenerator_Img(nn.Module):
 
         for i in range(num_blocks):
             if residual_mode == 'bottleneck':
-                model += [Bottleneck(ngf*4, ngf*4, ngf, norm=norm)]
+                model += [Bottleneck(ngf*4, ngf*4, ngf*2, norm=norm)]
             else:
                 model += [Basicblock(ngf*4, norm=norm)]
 
