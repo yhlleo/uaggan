@@ -38,7 +38,7 @@ class ResNetGenerator_Att(nn.Module):
                  norm_layer(ngf),
                  nn.ReLU(inplace=True),
                  nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
-                 norm_layer(ngf),
+                 norm_layer(ngf*2),
                  nn.ReLU(inplace=True)]
 
         model += [Basicblock(ngf*2, norm=norm)]
