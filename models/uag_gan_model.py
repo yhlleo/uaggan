@@ -30,8 +30,8 @@ class UAGGANModel(BaseModel):
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
         self.loss_names = ['D_A', 'D_B', 'G_A', 'G_B', 'cycle_A', 'cycle_B']
-        self.visual_names = ['real_A', 'att_A', 'fake_B', 'masked_fake_B', 
-                             'real_B', 'att_B', 'fake_A', 'masked_fake_A']
+        self.visual_names = ['real_A', 'att_A_viz', 'fake_B', 'masked_fake_B', 
+                             'real_B', 'att_B_viz', 'fake_A', 'masked_fake_A']
         if self.isTrain:
             self.model_names = ['G_att_A', 'G_att_B', 'G_img_A', 'G_img_B', 'D_A', 'D_B']
         else:  # during test time, only load Gs
@@ -139,7 +139,7 @@ class UAGGANModel(BaseModel):
         self.cycle_masked_fake_B = self.cycle_fake_B*self.cycle_att_A + self.masked_fake_A*(1-self.cycle_att_A)
 
         # just for visualization
-        self.att_A, self.att_B = (self.att_A-0.5)/0.5, (self.att_B-0.5)/0.5
+        self.att_A_viz, self.att_B_viz = (self.att_A.detach()-0.5)/0.5, (self.att_B.detach()-0.5)/0.5
 
     def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator

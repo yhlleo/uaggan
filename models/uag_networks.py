@@ -24,9 +24,10 @@ class Basicblock(nn.Module):
                     nn.Conv2d(in_feat, in_feat, kernel_size=kernel_size, stride=stride, padding=padding, bias=False),
                     norm_layer(in_feat)]
         self.residual = nn.Sequential(*residual)
+        self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
-        return x + self.residual(x)
+        return self.relu(x + self.residual(x))
 
 class Bottleneck(nn.Module):
     def __init__(self, in_feat, out_feat, depth_bottleneck, stride=1, norm='instance'):
@@ -52,6 +53,7 @@ class Bottleneck(nn.Module):
                     nn.Conv2d(depth_bottleneck, out_feat, kernel_size=1, stride=1, bias=False),
                     norm_layer(out_feat)]
         self.residual = nn.Sequential(*residual)
+        self.relu = nn,ReLU(inplace=True)
 
     def forward(self, x):
         preact = self.preact(x)
@@ -59,11 +61,11 @@ class Bottleneck(nn.Module):
             shortcut = self.shortcut(x)
         else:
             shortcut = self.shortcut(preact)
-        return shortcut + self.residual(x)
+        return self.relu(shortcut + self.residual(x))
 
 class ResNetGenerator_Att(nn.Module):
     '''ResNet-based generator for attention mask prediction.'''
-    def __init__(self, in_nc, ngf, norm='instance', residual_mode='bottleneck'):
+    def __init__(self, in_nc, ngf, norm='instance', residual_mode='basic'):
         super(ResNetGenerator_Att, self).__init__()
         assert residual_mode in ['bottleneck', 'basic']
 
@@ -103,7 +105,7 @@ class ResNetGenerator_Att(nn.Module):
 
 class ResNetGenerator_Img(nn.Module):
     '''ResNet-based generator for target generation.'''
-    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', residual_mode='bottleneck'):
+    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', residual_mode='basic'):
         super(ResNetGenerator_Img, self).__init__()
         assert residual_mode in ['bottleneck', 'basic']
 
