@@ -131,7 +131,7 @@ def define_net_att(in_nc,
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
-    net = ResNetGenerator_Att(in_nc, ngf, norm=norm, block_mode=block_mode)
+    net = ResNetGenerator_Att(in_nc, ngf, norm=norm)
     return init_net(net, init_type, init_gain, gpu_ids)
 
 def define_net_img(in_nc, 
@@ -142,7 +142,7 @@ def define_net_img(in_nc,
                    init_type='normal', 
                    init_gain=0.02, 
                    gpu_ids=[]):
-    net = ResNetGenerator_Img(in_nc, out_nc, ngf, num_blocks=num_blocks, norm=norm, block_mode=block_mode)
+    net = ResNetGenerator_Img(in_nc, out_nc, ngf, num_blocks=num_blocks, norm=norm)
     return init_net(net, init_type, init_gain, gpu_ids)
 
 def define_net_dis(in_nc, 
