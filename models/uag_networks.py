@@ -69,38 +69,35 @@ class ResNetGenerator_Att(nn.Module):
         assert residual_mode in ['bottleneck', 'basic']
 
         norm_layer = get_norm_layer(norm)
-        model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=2, padding=3, bias=False),
-                 norm_layer(ngf),
-                 nn.ReLU(True),
-                 nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
-                 norm_layer(ngf*2),
-                 nn.ReLU(True)]
+        encoder = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=2, padding=3, bias=False),
+                   norm_layer(ngf),
+                   nn.ReLU(True),
+                   nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
+                   norm_layer(ngf*2),
+                   nn.ReLU(True)]
 
         if residual_mode == 'bottleneck':
-            model += [Bottleneck(ngf*2, ngf*2, ngf*2, norm=norm)]
+            encoder += [Bottleneck(ngf*2, ngf*2, ngf*2, norm=norm)]
         else:
-            model += [Basicblock(ngf*2, norm=norm)]
+            encoder += [Basicblock(ngf*2, norm=norm)]
+        self.encoder = nn.Sequential(*encoder)
 
-        model += [nn.ConvTranspose2d(ngf*2, ngf*2, kernel_size=3, stride=2,
-                                     padding=1, output_padding=1, bias=False),
-                  norm_layer(ngf*2),
-                  nn.ReLU(True),
-                  nn.Conv2d(ngf*2, ngf*2, kernel_size=3, stride=1, padding=1, bias=False),
-                  norm_layer(ngf*2),
-                  nn.ReLU(True),
-                  nn.ConvTranspose2d(ngf*2, ngf*2, kernel_size=3, stride=2,
-                                     padding=1, output_padding=1, bias=False),
-                  norm_layer(ngf*2),
-                  nn.ReLU(True),
-                  nn.Conv2d(ngf*2, ngf, kernel_size=3, stride=1, padding=1, bias=False),
-                  norm_layer(ngf),
-                  nn.ReLU(True),
-                  nn.Conv2d(ngf, 1, kernel_size=7, stride=1, padding=3, bias=False),
-                  nn.Sigmoid()]
-        self.model = nn.Sequential(*model)
+        self.decoder1 = nn.Sequential(nn.Conv2d(ngf*2, ngf*2, kernel_size=3, stride=1, padding=1, bias=False),
+                                      norm_layer(ngf*2),
+                                      nn.ReLU(True))
+
+        self.decoder2 = nn.Sequential(nn.Conv2d(ngf*2, ngf, kernel_size=3, stride=1, padding=1, bias=False),
+                                      norm_layer(ngf),
+                                      nn.ReLU(True),
+                                      nn.Conv2d(ngf, 1, kernel_size=7, stride=1, padding=3, bias=False),
+                                      nn.Sigmoid())
+        self.up2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
     
     def forward(self, x):
-        return self.model(x)
+        encoder = self.encoder(x)
+        decoder1 = self.decoder1(self.up2(encoder))
+        decoder2 = self.decoder2(self.up2(decoder1))
+        return decoder2
 
 class ResNetGenerator_Img(nn.Module):
     '''ResNet-based generator for target generation.'''
@@ -125,12 +122,12 @@ class ResNetGenerator_Img(nn.Module):
             else:
                 model += [Basicblock(ngf*4, norm=norm)]
 
-        model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=3, stride=2,
-                                         padding=1, output_padding=1, bias=False),
+        model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=4, stride=2,
+                                     padding=1, bias=False),
                   norm_layer(ngf*2),
                   nn.ReLU(True),
-                  nn.ConvTranspose2d(ngf*2, ngf, kernel_size=3, stride=2,
-                                         padding=1, output_padding=1, bias=False),
+                  nn.ConvTranspose2d(ngf*2, ngf, kernel_size=4, stride=2,
+                                     padding=1, bias=False),
                   norm_layer(ngf),
                   nn.ReLU(True),
                   nn.Conv2d(ngf, out_nc, kernel_size=7, stride=1, padding=3, bias=False),
