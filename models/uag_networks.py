@@ -141,9 +141,10 @@ class ResNetGenerator_Img(nn.Module):
 
 class Discriminator(nn.Module):
     '''Discriminator'''
-    def __init__(self, in_nc, ndf, n_layers=3, norm='instance'):
+    def __init__(self, in_nc, ndf, n_layers=3, norm='instance', transition_rate=0.1):
         super(Discriminator, self).__init__()
 
+        self.transition_rate = transition_rate
         norm_layer = get_norm_layer(norm)
         model = [nn.Conv2d(in_nc, ndf, kernel_size=4, stride=2, padding=1, bias=False), 
                  norm_layer(ndf),
@@ -160,8 +161,9 @@ class Discriminator(nn.Module):
         model += [nn.Conv2d(cur_out, 1, kernel_size=4, stride=1, padding=1, bias=False)]
         self.model = nn.Sequential(*model)
 
-    def forward(self, x):
-        return self.model(x)
+    def forward(self, x, mask):
+        x_ = x*(mask>self.transition_rate).float()
+        return self.model(x_)
 
 def define_net_att(in_nc, 
                    ngf, 
