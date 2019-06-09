@@ -21,7 +21,6 @@ class UAGGANModel(BaseModel):
 
     def __init__(self, opt):
         """Initialize the UAGGAN class.
-
         Parameters:
             opt (Option class)-- stores all the experiment flags; needs to be a subclass of BaseOptions
         """
