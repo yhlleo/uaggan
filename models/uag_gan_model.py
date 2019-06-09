@@ -157,6 +157,7 @@ class UAGGANModel(BaseModel):
         loss_D_fake = self.criterionGAN(pred_fake, False)
         # Combined loss and calculate gradients
         loss_D = (loss_D_real + loss_D_fake) * 0.5
+        loss_D.backward()
         return loss_D
 
     def backward_D(self):
@@ -165,8 +166,6 @@ class UAGGANModel(BaseModel):
 
         masked_fake_A = self.masked_fake_A_pool.query(self.masked_fake_A)
         self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, masked_fake_A)
-        self.loss_D = self.loss_D_A + self.loss_D_B
-        self.loss_D.backward()
 
     def backward_G(self):
         """Calculate the loss for generators G_A and G_B"""
@@ -195,7 +194,7 @@ class UAGGANModel(BaseModel):
         self.backward_G()             # calculate gradients for G_A and G_B
         self.optimizer_G.step()       # update G_A and G_B's weights
         # D_A and D_B
-        self.set_requires_grad([self.netD_A, self.netD_B], False)
+        self.set_requires_grad([self.netD_A, self.netD_B], True)
         self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
         self.backward_D()      # calculate gradients for D_A
         self.optimizer_D.step()  # update D_A and D_B's weights
