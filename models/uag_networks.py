@@ -53,7 +53,6 @@ class Bottleneck(nn.Module):
                     nn.Conv2d(depth_bottleneck, out_feat, kernel_size=1, stride=1, bias=False),
                     norm_layer(out_feat)]
         self.residual = nn.Sequential(*residual)
-        #self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
         preact = self.preact(x)
@@ -72,10 +71,10 @@ class ResNetGenerator_Att(nn.Module):
         norm_layer = get_norm_layer(norm)
         model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=2, padding=3, bias=False),
                  norm_layer(ngf),
-                 nn.ReLU(inplace=True),
+                 nn.ReLU(True),
                  nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
                  norm_layer(ngf*2),
-                 nn.ReLU(inplace=True)]
+                 nn.ReLU(True)]
 
         if residual_mode == 'bottleneck':
             model += [Bottleneck(ngf*2, ngf*2, ngf*2, norm=norm)]
@@ -85,17 +84,17 @@ class ResNetGenerator_Att(nn.Module):
         model += [nn.ConvTranspose2d(ngf*2, ngf*2, kernel_size=3, stride=2,
                                      padding=1, output_padding=1, bias=False),
                   norm_layer(ngf*2),
-                  nn.ReLU(inplace=True),
+                  nn.ReLU(True),
                   nn.Conv2d(ngf*2, ngf*2, kernel_size=3, stride=1, padding=1, bias=False),
                   norm_layer(ngf*2),
-                  nn.ReLU(inplace=True),
+                  nn.ReLU(True),
                   nn.ConvTranspose2d(ngf*2, ngf*2, kernel_size=3, stride=2,
                                      padding=1, output_padding=1, bias=False),
                   norm_layer(ngf*2),
-                  nn.ReLU(inplace=True),
+                  nn.ReLU(True),
                   nn.Conv2d(ngf*2, ngf, kernel_size=3, stride=1, padding=1, bias=False),
                   norm_layer(ngf),
-                  nn.ReLU(inplace=True),
+                  nn.ReLU(True),
                   nn.Conv2d(ngf, 1, kernel_size=7, stride=1, padding=3, bias=False),
                   nn.Sigmoid()]
         self.model = nn.Sequential(*model)
@@ -112,13 +111,13 @@ class ResNetGenerator_Img(nn.Module):
         norm_layer = get_norm_layer(norm)
         model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=1, padding=3, bias=False),
                  norm_layer(ngf),
-                 nn.ReLU(inplace=True),
+                 nn.ReLU(True),
                  nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
                  norm_layer(ngf*2),
-                 nn.ReLU(inplace=True),
+                 nn.ReLU(True),
                  nn.Conv2d(ngf*2, ngf*4, kernel_size=3, stride=2, padding=1, bias=False),
                  norm_layer(ngf*4),
-                 nn.ReLU(inplace=True)]
+                 nn.ReLU(True)]
 
         for i in range(num_blocks):
             if residual_mode == 'bottleneck':
@@ -129,11 +128,11 @@ class ResNetGenerator_Img(nn.Module):
         model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=3, stride=2,
                                          padding=1, output_padding=1, bias=False),
                   norm_layer(ngf*2),
-                  nn.ReLU(inplace=True),
+                  nn.ReLU(True),
                   nn.ConvTranspose2d(ngf*2, ngf, kernel_size=3, stride=2,
                                          padding=1, output_padding=1, bias=False),
                   norm_layer(ngf),
-                  nn.ReLU(inplace=True),
+                  nn.ReLU(True),
                   nn.Conv2d(ngf, out_nc, kernel_size=7, stride=1, padding=3, bias=False),
                   nn.Tanh()]
 

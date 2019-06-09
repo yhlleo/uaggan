@@ -5,8 +5,6 @@ from .base_model import BaseModel
 from . import networks 
 from . import uag_networks as uag
 
-# TODO: finish the model
-
 class UAGGANModel(BaseModel):
     '''
       An implement of the UAGGAN model.
