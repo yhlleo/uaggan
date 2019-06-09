@@ -36,7 +36,7 @@ nohup sh -u ./scripts/train_uaggan.sh <gpu_id> > uag.log &
 sh ./scripts/test_uaggan.sh <gpu_id>
 ```
 
-### Fast version
+### Faster version
 
 Combining the attention module and domain translation module into one generator.
 
