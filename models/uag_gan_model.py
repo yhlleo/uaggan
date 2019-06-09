@@ -181,7 +181,7 @@ class UAGGANModel(BaseModel):
         # Backward cycle loss || G_A(G_B(B)) - B||
         self.loss_cycle_B = self.criterionCycle(self.cycle_masked_fake_B, self.real_B) * lambda_B
         # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B# + self.loss_cycle_A + self.loss_cycle_B
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B
         self.loss_G.backward()
     
     def optimize_parameters(self):
@@ -196,5 +196,5 @@ class UAGGANModel(BaseModel):
         # D_A and D_B
         self.set_requires_grad([self.netD_A, self.netD_B], True)
         self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
-        self.backward_D()      # calculate gradients for D_A
+        self.backward_D()        # calculate gradients for D_A
         self.optimizer_D.step()  # update D_A and D_B's weights
