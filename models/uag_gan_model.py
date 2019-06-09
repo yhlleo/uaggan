@@ -1,6 +1,6 @@
 import torch
 import itertools
-from util.image_pool import ImageMaskPool
+from util.image_pool import ImageMaskPool, ImagePool
 from .base_model import BaseModel
 from . import networks 
 from . import uag_networks as uag
@@ -83,8 +83,8 @@ class UAGGANModel(BaseModel):
                                              gpu_ids=opt.gpu_ids)
 
         if self.isTrain:
-            self.masked_fake_A_pool = ImageMaskPool(opt.pool_size)
-            self.masked_fake_B_pool = ImageMaskPool(opt.pool_size)  # create image buffer to store previously generated images
+            self.masked_fake_A_pool = ImagePool(opt.pool_size)
+            self.masked_fake_B_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
             # define loss functions
             self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)  # define GAN loss.
             self.criterionCycle = torch.nn.L1Loss()
@@ -139,7 +139,7 @@ class UAGGANModel(BaseModel):
         # just for visualization
         self.att_A_viz, self.att_B_viz = (self.att_A-0.5)/0.5, (self.att_B-0.5)/0.5
 
-    def backward_D_basic(self, netD, real, real_att, fake, fake_att):
+    def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator
 
         Parameters:
@@ -151,10 +151,10 @@ class UAGGANModel(BaseModel):
         We also call loss_D.backward() to calculate the gradients.
         """
         # Real
-        pred_real = netD(real, real_att.detach())
+        pred_real = netD(real)
         loss_D_real = self.criterionGAN(pred_real, True)
         # Fake
-        pred_fake = netD(fake.detach(), fake_att.detach())
+        pred_fake = netD(fake.detach())
         loss_D_fake = self.criterionGAN(pred_fake, False)
         # Combined loss and calculate gradients
         loss_D = (loss_D_real + loss_D_fake) * 0.5
@@ -162,11 +162,11 @@ class UAGGANModel(BaseModel):
         return loss_D
 
     def backward_D(self):
-        masked_fake_B, att_A = self.masked_fake_B_pool.query(self.masked_fake_B, self.att_A)
-        self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, self.att_B, masked_fake_B, att_A)
+        masked_fake_B, att_A = self.masked_fake_B_pool.query(self.masked_fake_B)
+        self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, masked_fake_B)
 
-        masked_fake_A, att_B = self.masked_fake_A_pool.query(self.masked_fake_A, self.att_B)
-        self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, self.att_A, masked_fake_A, att_B)
+        masked_fake_A, att_B = self.masked_fake_A_pool.query(self.masked_fake_A)
+        self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, masked_fake_A)
         self.loss_D = self.loss_D_A + self.loss_D_B
         self.loss_D.backward()
 
@@ -176,9 +176,9 @@ class UAGGANModel(BaseModel):
         lambda_B = self.opt.lambda_B
 
         # GAN loss D_A(G(A))
-        self.loss_G_A = self.criterionGAN(self.netD_A(self.masked_fake_B, self.att_A), True)
+        self.loss_G_A = self.criterionGAN(self.netD_A(self.masked_fake_B), True)
         # GAN loss D_B(G(B))
-        self.loss_G_B = self.criterionGAN(self.netD_B(self.masked_fake_A, self.att_B), True)
+        self.loss_G_B = self.criterionGAN(self.netD_B(self.masked_fake_A), True)
         # Forward cycle loss || G_B(G_A(A)) - A||
         self.loss_cycle_A = self.criterionCycle(self.cycle_masked_fake_A, self.real_A) * lambda_A
         # Backward cycle loss || G_A(G_B(B)) - B||

@@ -24,10 +24,9 @@ class Basicblock(nn.Module):
                     nn.Conv2d(in_feat, in_feat, kernel_size=kernel_size, stride=stride, padding=padding, bias=False),
                     norm_layer(in_feat)]
         self.residual = nn.Sequential(*residual)
-        #self.relu = nn.ReLU(inplace=True)
-
+        self.relu = nn.ReLU(True)
     def forward(self, x):
-        return x + self.residual(x)
+        return self.relu(x + self.residual(x))
 
 class Bottleneck(nn.Module):
     def __init__(self, in_feat, out_feat, depth_bottleneck, stride=1, norm='instance'):
@@ -53,6 +52,7 @@ class Bottleneck(nn.Module):
                     nn.Conv2d(depth_bottleneck, out_feat, kernel_size=1, stride=1, bias=False),
                     norm_layer(out_feat)]
         self.residual = nn.Sequential(*residual)
+        self.relu = nn.ReLU(True)
 
     def forward(self, x):
         preact = self.preact(x)
@@ -60,7 +60,7 @@ class Bottleneck(nn.Module):
             shortcut = self.shortcut(x)
         else:
             shortcut = self.shortcut(preact)
-        return shortcut + self.residual(x)
+        return self.relu(shortcut + self.residual(x))
 
 class ResNetGenerator_Att(nn.Module):
     '''ResNet-based generator for attention mask prediction.'''
@@ -132,7 +132,6 @@ class ResNetGenerator_Img(nn.Module):
                   nn.ReLU(True),
                   nn.Conv2d(ngf, out_nc, kernel_size=7, stride=1, padding=3, bias=False),
                   nn.Tanh()]
-
         self.model = nn.Sequential(*model)
 
     def forward(self, x):
@@ -161,9 +160,9 @@ class Discriminator(nn.Module):
         model += [nn.Conv2d(cur_out, 1, kernel_size=4, stride=1, padding=1, bias=False)]
         self.model = nn.Sequential(*model)
 
-    def forward(self, x, mask):
-        x_ = x*(mask>self.transition_rate).float()
-        return self.model(x_)
+    def forward(self, x):#, mask):
+        #x_ = x*(mask>self.transition_rate).float()
+        return self.model(x)
 
 def define_net_att(in_nc, 
                    ngf, 
