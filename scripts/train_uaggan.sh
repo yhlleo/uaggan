@@ -1,4 +1,4 @@
-GPU_ID=0
+GPU_ID=$1
 
 python train.py \
   --dataroot ./datasets/horse2zebra \
