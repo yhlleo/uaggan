@@ -160,9 +160,9 @@ class Discriminator(nn.Module):
         model += [nn.Conv2d(cur_out, 1, kernel_size=4, stride=1, padding=1, bias=False)]
         self.model = nn.Sequential(*model)
 
-    def forward(self, x, mask):
-        x_ = x*(mask>self.transition_rate).float()
-        return self.model(x_)
+    def forward(self, x):
+        #x_ = x*(mask>self.transition_rate).float()
+        return self.model(x)
 
 def define_net_att(in_nc, 
                    ngf, 
