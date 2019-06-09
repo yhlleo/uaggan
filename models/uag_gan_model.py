@@ -162,10 +162,10 @@ class UAGGANModel(BaseModel):
 
     def backward_D(self):
         masked_fake_B, att_A = self.masked_fake_B_pool.query(self.masked_fake_B, self.att_A)
-        self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B*self.att_B, masked_fake_B*att_A)
+        self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B*self.att_B.detach(), masked_fake_B*att_A)
 
         masked_fake_A, att_B = self.masked_fake_A_pool.query(self.masked_fake_A, self.att_B)
-        self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A*self.att_A, masked_fake_A*att_B)
+        self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A*self.att_A.detach(), masked_fake_A*att_B)
 
     def backward_G(self):
         """Calculate the loss for generators G_A and G_B"""
