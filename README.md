@@ -21,20 +21,26 @@ bash ./datasets/download_cyclegan_dataset.sh horse2zebra
  - Training
 
 ```
-sh ./scripts/train_uaggan.sh
+sh ./scripts/train_uaggan.sh <gpu_id>
 ```
 
 or
 
 ```
-nohup sh -u ./scripts/train_uaggan.sh > uag.log &
+nohup sh -u ./scripts/train_uaggan.sh <gpu_id> > uag.log &
 ```
 
 - Test
 
 ```
-sh ./scripts/test_uaggan.sh
+sh ./scripts/test_uaggan.sh <gpu_id>
 ```
+
+### Fast version
+
+Combining the attention module and domain translation module into one generator.
+
+//TODO
 
 ### Mapping results
 
