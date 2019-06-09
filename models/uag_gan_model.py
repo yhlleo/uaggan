@@ -162,10 +162,10 @@ class UAGGANModel(BaseModel):
         return loss_D
 
     def backward_D(self):
-        masked_fake_B, att_A = self.masked_fake_B_pool.query(self.masked_fake_B)
+        masked_fake_B = self.masked_fake_B_pool.query(self.masked_fake_B)
         self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, masked_fake_B)
 
-        masked_fake_A, att_B = self.masked_fake_A_pool.query(self.masked_fake_A)
+        masked_fake_A = self.masked_fake_A_pool.query(self.masked_fake_A)
         self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, masked_fake_A)
         self.loss_D = self.loss_D_A + self.loss_D_B
         self.loss_D.backward()
