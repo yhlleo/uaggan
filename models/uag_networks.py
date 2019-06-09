@@ -20,14 +20,14 @@ class Basicblock(nn.Module):
         norm_layer = get_norm_layer(norm)
         residual = [nn.Conv2d(in_feat, in_feat, kernel_size=kernel_size, stride=stride, padding=padding, bias=False),
                     norm_layer(in_feat),
-                    nn.ReLU(inplace=True),
+                    nn.ReLU(True),
                     nn.Conv2d(in_feat, in_feat, kernel_size=kernel_size, stride=stride, padding=padding, bias=False),
                     norm_layer(in_feat)]
         self.residual = nn.Sequential(*residual)
-        self.relu = nn.ReLU(inplace=True)
+        #self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
-        return self.relu(x + self.residual(x))
+        return x + self.residual(x)
 
 class Bottleneck(nn.Module):
     def __init__(self, in_feat, out_feat, depth_bottleneck, stride=1, norm='instance'):
@@ -46,14 +46,14 @@ class Bottleneck(nn.Module):
 
         residual = [nn.Conv2d(in_feat, depth_bottleneck, kernel_size=1, stride=1, bias=False),
                     norm_layer(depth_bottleneck),
-                    nn.ReLU(inplace=True),
+                    nn.ReLU(True),
                     nn.Conv2d(depth_bottleneck, depth_bottleneck, kernel_size=3, stride=stride, padding=1, bias=False),
                     norm_layer(depth_bottleneck),
-                    nn.ReLU(inplace=True),
+                    nn.ReLU(True),
                     nn.Conv2d(depth_bottleneck, out_feat, kernel_size=1, stride=1, bias=False),
                     norm_layer(out_feat)]
         self.residual = nn.Sequential(*residual)
-        self.relu = nn.ReLU(inplace=True)
+        #self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x):
         preact = self.preact(x)
@@ -61,7 +61,7 @@ class Bottleneck(nn.Module):
             shortcut = self.shortcut(x)
         else:
             shortcut = self.shortcut(preact)
-        return self.relu(shortcut + self.residual(x))
+        return shortcut + self.residual(x)
 
 class ResNetGenerator_Att(nn.Module):
     '''ResNet-based generator for attention mask prediction.'''
