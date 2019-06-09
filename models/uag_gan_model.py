@@ -82,8 +82,8 @@ class UAGGANModel(BaseModel):
                                              gpu_ids=opt.gpu_ids)
 
         if self.isTrain:
-            self.masked_fake_A_pool = ImagePool(opt.pool_size)
-            self.masked_fake_B_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
+            self.masked_fake_A_pool = ImageMaskPool(opt.pool_size)
+            self.masked_fake_B_pool = ImageMaskPool(opt.pool_size)  # create image buffer to store previously generated images
             # define loss functions
             self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)  # define GAN loss.
             self.criterionCycle = torch.nn.L1Loss()
