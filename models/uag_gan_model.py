@@ -27,7 +27,7 @@ class UAGGANModel(BaseModel):
         """
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = ['D_A', 'D_B', 'G_A', 'G_B', 'cycle_A', 'cycle_B']
+        self.loss_names = ['D_A', 'D_B', 'G_A', 'G_B']#, 'cycle_A', 'cycle_B']
         self.visual_names = ['real_A', 'att_A_viz', 'fake_B', 'masked_fake_B', 
                              'real_B', 'att_B_viz', 'fake_A', 'masked_fake_A']
         if self.isTrain:
@@ -126,7 +126,7 @@ class UAGGANModel(BaseModel):
         self.att_B = self.netG_att_B(self.real_B)
         self.fake_A = self.netG_img_B(self.real_B)
         self.masked_fake_A = self.fake_A*self.att_B + self.real_B*(1-self.att_B)
-
+        '''
         # cycle G(G(A)) -> A
         self.cycle_att_B = self.netG_att_B(self.masked_fake_B)
         self.cycle_fake_A = self.netG_img_B(self.masked_fake_B)
@@ -135,7 +135,7 @@ class UAGGANModel(BaseModel):
         self.cycle_att_A = self.netG_att_A(self.masked_fake_A)
         self.cycle_fake_B = self.netG_img_A(self.masked_fake_A)
         self.cycle_masked_fake_B = self.cycle_fake_B*self.cycle_att_A + self.masked_fake_A*(1-self.cycle_att_A)
-
+        '''
         # just for visualization
         self.att_A_viz, self.att_B_viz = (self.att_A-0.5)/0.5, (self.att_B-0.5)/0.5
 
@@ -180,11 +180,11 @@ class UAGGANModel(BaseModel):
         # GAN loss D_B(G(B))
         self.loss_G_B = self.criterionGAN(self.netD_B(self.masked_fake_A), True)
         # Forward cycle loss || G_B(G_A(A)) - A||
-        self.loss_cycle_A = self.criterionCycle(self.cycle_masked_fake_A, self.real_A) * lambda_A
+        #self.loss_cycle_A = self.criterionCycle(self.cycle_masked_fake_A, self.real_A) * lambda_A
         # Backward cycle loss || G_A(G_B(B)) - B||
-        self.loss_cycle_B = self.criterionCycle(self.cycle_masked_fake_B, self.real_B) * lambda_B
+        #self.loss_cycle_B = self.criterionCycle(self.cycle_masked_fake_B, self.real_B) * lambda_B
         # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B
+        self.loss_G = self.loss_G_A + self.loss_G_B# + self.loss_cycle_A + self.loss_cycle_B
         self.loss_G.backward()
     
     def optimize_parameters(self):
@@ -192,12 +192,12 @@ class UAGGANModel(BaseModel):
         # forward
         self.forward()      # compute fake images and reconstruction images.
         # G_A and G_B
-        self.set_requires_grad([self.netD_A, self.netD_B], True)  # Ds require no gradients when optimizing Gs
-        self.optimizer_D.zero_grad()  # set G_A and G_B's gradients to zero
-        self.backward_D()             # calculate gradients for G_A and G_B
-        self.optimizer_D.step()       # update G_A and G_B's weights
+        self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
+        self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
+        self.backward_G()             # calculate gradients for G_A and G_B
+        self.optimizer_G.step()       # update G_A and G_B's weights
         # D_A and D_B
         self.set_requires_grad([self.netD_A, self.netD_B], False)
-        self.optimizer_G.zero_grad()   # set D_A and D_B's gradients to zero
-        self.backward_G()      # calculate gradients for D_A
-        self.optimizer_G.step()  # update D_A and D_B's weights
+        self.optimizer_D.zero_grad()   # set D_A and D_B's gradients to zero
+        self.backward_D()      # calculate gradients for D_A
+        self.optimizer_D.step()  # update D_A and D_B's weights
