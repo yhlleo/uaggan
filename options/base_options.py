@@ -41,7 +41,7 @@ class BaseOptions():
         parser.add_argument('--no_dropout', action='store_true', help='no dropout for the generator')
 
         parser.add_argument('--thresh', type=float, default=0.1, help='threshold of binarizing the attention map')
-        
+        parser.add_argument('--use_early_stopping', type=int, default=0, help='using early stopping during training')
         # dataset parameters
         parser.add_argument('--dataset_mode', type=str, default='unaligned', help='chooses how datasets are loaded.')
         parser.add_argument('--direction', type=str, default='AtoB', help='AtoB or BtoA')

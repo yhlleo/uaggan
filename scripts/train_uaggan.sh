@@ -8,4 +8,5 @@ python3.5 train.py \
   --pool_size 50 \
   --gpu_ids ${GPU_ID} \
   --batch_size 1 \
+  --use_early_stopping 1 \
   --no_dropout
