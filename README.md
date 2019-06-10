@@ -52,8 +52,13 @@ Combining the attention module and domain translation module into one generator.
 
 [[More Results >>>]](./figures/Visualization-uag.md)
 
+ - horse2zebra (with early stopping, threshold=0.1)
+
+//TODO
+
  - apple2orange
 
+//TODO
 
 ----
 
