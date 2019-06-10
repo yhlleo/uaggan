@@ -1,6 +1,6 @@
 GPU_ID=$1
 
-python test.py \
+python3.5 test.py \
   --dataroot ./datasets/horse2zebra \
   --name uaggan_horse2zebra \
   --model uag_gan \

@@ -120,10 +120,14 @@ class UAGGANModel(BaseModel):
         # G(A) -> B
         self.att_A = self.netG_att_A(self.real_A)
         self.fake_B = self.netG_img_A(self.real_A)
+        if not self.isTrain:
+            self.att_A = (self.att_A>self.opt.thresh).float()
         self.masked_fake_B = self.fake_B*self.att_A + self.real_A*(1-self.att_A)
         # G(B) -> A
         self.att_B = self.netG_att_B(self.real_B)
         self.fake_A = self.netG_img_B(self.real_B)
+        if not self.isTrain:
+            self.att_B = (self.att_B>self.opt.thresh).float()
         self.masked_fake_A = self.fake_A*self.att_B + self.real_B*(1-self.att_B)
 
         # cycle G(G(A)) -> A

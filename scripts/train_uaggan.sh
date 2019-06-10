@@ -1,6 +1,6 @@
 GPU_ID=$1
 
-python train.py \
+python3.5 train.py \
   --dataroot ./datasets/horse2zebra \
   --name uaggan_horse2zebra \
   --model uag_gan \
