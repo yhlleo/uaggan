@@ -188,12 +188,15 @@ class UAGGANModel(BaseModel):
         self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B
         self.loss_G.backward()
     
-    def optimize_parameters(self):
+    def optimize_parameters(self, epoch):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
         # forward
         self.forward()      # compute fake images and reconstruction images.
         # G_A and G_B
-        self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
+        nets = [self.netD_A, self.netD_B]
+        if epoch > 30:
+            nets += [self.netG_att_A, self.netG_att_B] # Ds require no gradients when optimizing Gs
+        self.set_requires_grad(nets, False)
         self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
         self.backward_G()             # calculate gradients for G_A and G_B
         self.optimizer_G.step()       # update G_A and G_B's weights
