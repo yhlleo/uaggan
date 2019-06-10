@@ -5,7 +5,10 @@ A Pytorch implementation of "Unsupervised Attention-Guided Image-to-Image Transl
 
 ### Installation
 
-For Conda users, we provide a installation script `./scripts/conda_deps.sh`. Alternatively, you can create a new Conda environment using `conda env create -f environment.yml`.
+For Conda users, we provide a installation script `./scripts/conda_deps.sh`. Alternatively, you can create a new Conda environment using this command: 
+```
+conda env create -f environment.yml
+```
 
 ### Prepare Dataset:
 
