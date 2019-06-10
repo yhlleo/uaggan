@@ -4,8 +4,12 @@
 '''
   An implement of the UAGGAN model.
   
-  Paper: Unsupervised Attention-guided Image-to-Image Translation, NIPS 2018.
-         https://arxiv.org/pdf/1806.02311.pdf
+  Unsupervised Attention-guided Image-to-Image Translation, NIPS 2018.
+    https://arxiv.org/pdf/1806.02311.pdf
+
+  Other references: 
+  GANimation: Anatomically-aware Facial Animation from a Single Image.
+    https://arxiv.org/pdf/1807.09251.pdf
 '''
 
 import torch
@@ -138,6 +142,50 @@ class ResNetGenerator_Img(nn.Module):
         return self.model(x)
 
 
+class ResNetGenerator_v2(nn.Module):
+    '''ResNet-based generator for target generation.'''
+    def __init__(self, in_nc, out_nc, ngf, num_blocks=9, norm='instance', residual_mode='basic'):
+        super(ResNetGenerator_v2, self).__init__()
+        assert residual_mode in ['bottleneck', 'basic']
+
+        norm_layer = get_norm_layer(norm)
+        model = [nn.Conv2d(in_nc, ngf, kernel_size=7, stride=1, padding=3, bias=False),
+                 norm_layer(ngf),
+                 nn.ReLU(True),
+                 nn.Conv2d(ngf, ngf*2, kernel_size=3, stride=2, padding=1, bias=False),
+                 norm_layer(ngf*2),
+                 nn.ReLU(True),
+                 nn.Conv2d(ngf*2, ngf*4, kernel_size=3, stride=2, padding=1, bias=False),
+                 norm_layer(ngf*4),
+                 nn.ReLU(True)]
+
+        for i in range(num_blocks):
+            if residual_mode == 'bottleneck':
+                model += [Bottleneck(ngf*4, ngf*4, ngf, norm=norm)]
+            else:
+                model += [Basicblock(ngf*4, norm=norm)]
+
+        model += [nn.ConvTranspose2d(ngf*4, ngf*2, kernel_size=4, stride=2,
+                                     padding=1, bias=False),
+                  norm_layer(ngf*2),
+                  nn.ReLU(True),
+                  nn.ConvTranspose2d(ngf*2, ngf, kernel_size=4, stride=2,
+                                     padding=1, bias=False),
+                  norm_layer(ngf),
+                  nn.ReLU(True)]
+        self.model = nn.Sequential(*model)
+
+        self.img = nn.Sequential(nn.Conv2d(ngf, out_nc, kernel_size=7, stride=1, padding=3, bias=False),
+                                 nn.Tanh())
+
+        self.att = nn.Sequential(nn.Conv2d(ngf, 1, kernel_size=7, stride=1, padding=3, bias=False),
+                                 nn.Sigmoid())
+
+    def forward(self, x):
+        features = self.model(x)
+        return self.img(features), self.att(features)
+
+
 class Discriminator(nn.Module):
     '''Discriminator'''
     def __init__(self, in_nc, ndf, n_layers=3, norm='instance', transition_rate=0.1):
@@ -182,6 +230,18 @@ def define_net_img(in_nc,
                    init_gain=0.02, 
                    gpu_ids=[]):
     net = ResNetGenerator_Img(in_nc, out_nc, ngf, num_blocks=num_blocks, norm=norm)
+    return init_net(net, init_type, init_gain, gpu_ids)
+
+
+def define_net_faster(in_nc, 
+                      out_nc, 
+                      ngf, 
+                      num_blocks=9, 
+                      norm='instance', 
+                      init_type='normal', 
+                      init_gain=0.02, 
+                      gpu_ids=[]):
+    net = ResNetGenerator_v2(in_nc, out_nc, ngf, num_blocks=num_blocks, norm=norm)
     return init_net(net, init_type, init_gain, gpu_ids)
 
 def define_net_dis(in_nc, 
