@@ -5,4 +5,5 @@ python3.5 test.py \
   --name uaggan_horse2zebra \
   --model uag_gan \
   --phase test \
-  --num_test 10000
+  --num_test 500 \
+  --thresh 0.5
