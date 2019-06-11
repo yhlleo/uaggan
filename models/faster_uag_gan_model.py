@@ -31,7 +31,7 @@ class FasterUAGGANModel(BaseModel):
         """
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = ['D_A', 'D_B', 'G_A', 'G_B', 'cycle_A', 'cycle_B', 'smooth']
+        self.loss_names = ['D_A', 'D_B', 'G_A', 'G_B', 'cycle_A', 'cycle_B']#, 'smooth']
         self.visual_names = ['real_A', 'att_A_viz', 'fake_B', 'masked_fake_B', 
                              'real_B', 'att_B_viz', 'fake_A', 'masked_fake_A']
         if self.isTrain:
@@ -169,9 +169,9 @@ class FasterUAGGANModel(BaseModel):
         # Backward cycle loss || G_A(G_B(B)) - B||
         self.loss_cycle_B = self.criterionCycle(self.cycle_masked_fake_B, self.real_B) * lambda_B
 
-        self.loss_smooth = compute_loss_smooth(self.att_A) + compute_loss_smooth(self.att_B)
+        #self.loss_smooth = compute_loss_smooth(self.att_A) + compute_loss_smooth(self.att_B)
         # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_smooth
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B #+ self.loss_smooth
         self.loss_G.backward()
     
     def optimize_parameters(self, epoch):
