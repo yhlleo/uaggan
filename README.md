@@ -39,22 +39,6 @@ nohup sh -u ./scripts/train_uaggan.sh <gpu_id> > uag.log &
 sh ./scripts/test_uaggan.sh <gpu_id>
 ```
 
-### Faster version
-
-Combining the attention module and domain translation module into one generator, inspired by [GANimation](https://arxiv.org/pdf/1807.09251.pdf). (Results are not good.)
-
- - Training
-
-```
-sh ./scripts/train_faster_uaggan.sh <gpu_id>
-```
-
- - Testing
-
-```
-sh ./scripts/test_faster_uaggan.sh <gpu_id>
-```
-
 ### Mapping results
 
  - horse2zebra (without early stopping, threshold=0.1)
@@ -72,6 +56,26 @@ sh ./scripts/test_faster_uaggan.sh <gpu_id>
  - apple2orange
 
 //TODO
+
+### Faster version
+
+Combining the attention module and domain translation module into one generator, inspired by [GANimation](https://arxiv.org/pdf/1807.09251.pdf). (Results are not good.)
+
+ - Training
+
+```
+sh ./scripts/train_faster_uaggan.sh <gpu_id>
+```
+
+ - Testing
+
+```
+sh ./scripts/test_faster_uaggan.sh <gpu_id>
+```
+
+|Real A|Attention Mask|Fake B|Real B|Attention Mask|Fake A|
+|:----:|:----:|:----:|:----:|:----:|:----:|
+|![](./figures/no-early-stopping/n02381460_1110_real_A.png)|![](./figures/no-early-stopping/n02381460_1110_att_A_viz.png)|![](./figures/no-early-stopping/n02381460_1110_masked_fake_B.png)|![](./figures/no-early-stopping/n02381460_1000_real_B.png)|![](./figures/no-early-stopping/n02381460_1000_att_B_viz.png)|![](./figures/no-early-stopping/n02381460_1000_masked_fake_A.png)|
 
 ----
 
