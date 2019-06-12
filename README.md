@@ -59,7 +59,7 @@ sh ./scripts/test_uaggan.sh <gpu_id>
 
 ### Faster version
 
-Combining the attention module and domain translation module into one generator, inspired by [GANimation](https://arxiv.org/pdf/1807.09251.pdf). (Results are not good.)
+Combining the attention module and domain translation module into one generator, inspired by [GANimation](https://arxiv.org/pdf/1807.09251.pdf). (**Results are not good**.)
 
  - Training
 
