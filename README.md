@@ -79,4 +79,6 @@ sh ./scripts/test_faster_uaggan.sh <gpu_id>
 
 ----
 
-**Notes**: This project is based on the framework: [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
+### Acknowledgment
+
+This code is based on the [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix). Thanks to the contributors of this project.
