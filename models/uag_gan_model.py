@@ -194,7 +194,7 @@ class UAGGANModel(BaseModel):
         self.forward()      # compute fake images and reconstruction images.
         # G_A and G_B
         nets = [self.netD_A, self.netD_B]
-        if epoch > 30 and self.opt.use_early_stopping:
+        if epoch > 60 and self.opt.use_early_stopping:
             nets += [self.netG_att_A, self.netG_att_B] # Ds require no gradients when optimizing Gs
         self.set_requires_grad(nets, False)
         self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
