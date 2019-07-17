@@ -6,7 +6,7 @@ channels:
 - defaults
 dependencies:
 - python=3.5.5
-- pytorch=0.4
+- pytorch=0.4.1
 - scipy
 - opencv3
 - scikit-image
