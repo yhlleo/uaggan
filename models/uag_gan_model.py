@@ -82,8 +82,12 @@ class UAGGANModel(BaseModel):
                                              gpu_ids=opt.gpu_ids)
 
         if self.isTrain:
-            self.masked_fake_A_pool = ImagePool(opt.pool_size)
-            self.masked_fake_B_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
+            if self.opt.use_mask_for_D:
+                self.masked_fake_A_pool = ImageMaskPool(opt.pool_size)
+                self.masked_fake_B_pool = ImageMaskPool(opt.pool_size)
+            else:
+                self.masked_fake_A_pool = ImagePool(opt.pool_size)
+                self.masked_fake_B_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
             # define loss functions
             self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)  # define GAN loss.
             self.criterionCycle = torch.nn.L1Loss()
@@ -165,10 +169,18 @@ class UAGGANModel(BaseModel):
         return loss_D
 
     def backward_D(self):
-        masked_fake_B = self.masked_fake_B_pool.query(self.masked_fake_B)
+        if self.opt.use_mask_for_D:
+            masked_fake_B, att_A = self.masked_fake_B_pool.query(self.masked_fake_B, self.att_A)
+            masked_fake_B *= att_A
+        else:
+            masked_fake_B = self.masked_fake_B_pool.query(self.masked_fake_B)
         self.loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, masked_fake_B)
 
-        masked_fake_A = self.masked_fake_A_pool.query(self.masked_fake_A)
+        if self.opt.use_mask_for_D:
+            masked_fake_A, att_B = self.masked_fake_A_pool.query(self.masked_fake_A, self.att_B)
+            masked_fake_A *= att_B
+        else:
+            masked_fake_A = self.masked_fake_A_pool.query(self.masked_fake_A)
         self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, masked_fake_A)
 
     def backward_G(self):
@@ -177,8 +189,14 @@ class UAGGANModel(BaseModel):
         lambda_B = self.opt.lambda_B
 
         # GAN loss D_A(G(A))
+        masked_fake_B = self.masked_fake_B
+        if self.opt.use_mask_for_D:
+            masked_fake_B *= self.att_A
         self.loss_G_A = self.criterionGAN(self.netD_A(self.masked_fake_B), True)
         # GAN loss D_B(G(B))
+        masked_fake_A = self.masked_fake_A
+        if self.opt.use_mask_for_D:
+            masked_fake_A *= self.att_B
         self.loss_G_B = self.criterionGAN(self.netD_B(self.masked_fake_A), True)
         # Forward cycle loss || G_B(G_A(A)) - A||
         self.loss_cycle_A = self.criterionCycle(self.cycle_masked_fake_A, self.real_A) * lambda_A
